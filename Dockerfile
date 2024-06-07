@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 # HTTP server port
-EXPOSE 5008 
+EXPOSE 7001 
 # MQTT server port
 EXPOSE 6001 
 
