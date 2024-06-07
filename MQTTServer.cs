@@ -83,6 +83,7 @@ namespace MQTTnet.Samples.Server
                     "/mqtt",
                     httpConnectionDispatcherOptions => httpConnectionDispatcherOptions.WebSockets.SubProtocolSelector =
                         protocolList => protocolList.FirstOrDefault() ?? string.Empty);
+                endpoints.MapHealthChecks("/health");
             });
 
             app.UseMqttServer(server =>
@@ -134,7 +135,7 @@ namespace MQTTnet.Samples.Server
                 {
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 });
-
+            services.AddHealthChecks();
             // Configure CORS to allow requests from your frontend
             // services.AddCors(options =>
             // {
