@@ -125,14 +125,15 @@ namespace MQTTnet.Samples.Server
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "http://localhost:5009",
-                    ValidAudience = "http://localhost:5009",
+                    ValidIssuer = "http://localhost:5085",
+                    ValidAudience = "http://localhost:5085",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("9vL9PIK08MpvS5RD2AfuYatu8l/9WhANOULkmzdSL+E"))
                 };
             });
 
             services.AddScoped<MqttController>();
             services.AddScoped<MessageProcessor>();
+            services.AddScoped<UserRepository>();
 
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
