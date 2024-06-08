@@ -104,7 +104,7 @@ namespace MQTTnet.Samples.Server
             services.AddConnections();
 
             services.AddDbContext<MqttDbContext>(options =>
-                options.UseSqlServer("Server=XAVI;Database=MqttDb;Trusted_Connection=True;MultipleActiveResultSets=true;Encrypt=False"),
+                options.UseSqlServer("Server=tcp:germination-chamber.database.windows.net,1433;Initial Catalog=MqttDb;Persist Security Info=False;User ID=xa25alex_gmail.com;Password=ThisisnewPassword172523$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication='Active Directory Password';"),
                 ServiceLifetime.Scoped);
 
             services.AddAuthentication(options =>
@@ -120,8 +120,8 @@ namespace MQTTnet.Samples.Server
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "https://dolphin-app-hlqw2.ondigitalocean.app:5002/",
-                    ValidAudience = "https://dolphin-app-hlqw2.ondigitalocean.app:5002/",
+                    ValidIssuer = "https://dolphin-app-hlqw2.ondigitalocean.app:5002",
+                    ValidAudience = "https://dolphin-app-hlqw2.ondigitalocean.app:5002",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("9vL9PIK08MpvS5RD2AfuYatu8l/9WhANOULkmzdSL+E"))
                 };
             });
