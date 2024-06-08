@@ -2,9 +2,9 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 # HTTP server port
-EXPOSE 7001 
+EXPOSE 5085 
 # MQTT server port
-EXPOSE 6001 
+EXPOSE 1883 
 
 # Use the SDK image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build

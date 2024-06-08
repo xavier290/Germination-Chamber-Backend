@@ -44,6 +44,40 @@ namespace My_MQTT_Server
 
                         return true;
                     }
+                    else if (topic == "Humidity")
+                    {
+                        Console.WriteLine($"{topic}: {message} ºC.");
+
+                        var measure = new Measurement
+                        {
+                            IdSensor = 2,
+                            Topic = topic,
+                            Message = message,
+                            Fecha = DateTime.Now
+                        };
+
+                        _context.Measurements.Add(measure);
+                        await _context.SaveChangesAsync();
+
+                        return true;
+                    }
+                    else if (topic == "Luminosity")
+                    {
+                        Console.WriteLine($"{topic}: {message} ºC.");
+
+                        var measure = new Measurement
+                        {
+                            IdSensor = 3,
+                            Topic = topic,
+                            Message = message,
+                            Fecha = DateTime.Now
+                        };
+
+                        _context.Measurements.Add(measure);
+                        await _context.SaveChangesAsync();
+
+                        return true;
+                    }
                     else if (topic == "Start")
                     {
                         Console.WriteLine($"{topic}: '{message}'.");

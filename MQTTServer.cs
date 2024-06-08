@@ -19,8 +19,8 @@ namespace MQTTnet.Samples.Server
                 {
                     webBuilder.UseKestrel(o =>
                     {
-                        o.ListenAnyIP(6001, l => l.UseMqtt());
-                        o.ListenAnyIP(7001);
+                        o.ListenAnyIP(1883, l => l.UseMqtt());
+                        o.ListenAnyIP(5085);
                     });
                     webBuilder.UseStartup<Startup>();
                 });
