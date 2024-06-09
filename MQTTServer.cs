@@ -104,7 +104,7 @@ namespace MQTTnet.Samples.Server
             services.AddConnections();
 
             services.AddDbContext<MqttDbContext>(options =>
-                options.UseSqlServer("Server=tcp:germination-chamber.database.windows.net,1433;Initial Catalog=MqttDb;Persist Security Info=False;User ID=xa25alex_gmail.com;Password=ThisisnewPassword172523$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication='Active Directory Password';"),
+                options.UseSqlServer("Server=tcp:germination-chamber.database.windows.net,1433;Initial Catalog=MqttDb;Persist Security Info=False;User ID=Xavi;Password=GerminationChamber172523@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"),
                 ServiceLifetime.Scoped);
 
             services.AddAuthentication(options =>

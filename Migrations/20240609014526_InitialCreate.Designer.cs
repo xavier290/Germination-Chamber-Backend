@@ -12,7 +12,7 @@ using ModelsMQTT_Server;
 namespace GerminationChamber_Backend.Migrations
 {
     [DbContext(typeof(MqttDbContext))]
-    [Migration("20240607003436_InitialCreate")]
+    [Migration("20240609014526_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
