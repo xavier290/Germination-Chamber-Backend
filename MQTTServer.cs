@@ -120,8 +120,8 @@ namespace MQTTnet.Samples.Server
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "https://dolphin-app-hlqw2.ondigitalocean.app:5002",
-                    ValidAudience = "https://dolphin-app-hlqw2.ondigitalocean.app:5002",
+                    ValidIssuer = "https://dolphin-app-hlqw2.ondigitalocean.app/",
+                    ValidAudience = "https://dolphin-app-hlqw2.ondigitalocean.app/",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("9vL9PIK08MpvS5RD2AfuYatu8l/9WhANOULkmzdSL+E"))
                 };
             });

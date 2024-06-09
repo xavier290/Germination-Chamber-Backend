@@ -67,8 +67,8 @@ namespace MQTTnet.Samples.Server.Controllers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: "https://dolphin-app-hlqw2.ondigitalocean.app:5002",
-                audience: "https://dolphin-app-hlqw2.ondigitalocean.app:5002",
+                issuer: "https://dolphin-app-hlqw2.ondigitalocean.app/",
+                audience: "https://dolphin-app-hlqw2.ondigitalocean.app/",
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(1440),
                 signingCredentials: creds);
