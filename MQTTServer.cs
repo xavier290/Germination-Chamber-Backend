@@ -22,7 +22,6 @@ namespace MQTTnet.Samples.Server
                         o.ListenAnyIP(1883, l => l.UseMqtt());
                         o.ListenAnyIP(5002, listenOptions =>
                         {
-                            listenOptions.UseHttps(); // Enable HTTPS if needed
                             listenOptions.UseMqtt();  // Enable MQTT
                         });
                     });
