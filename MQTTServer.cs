@@ -21,6 +21,7 @@ namespace MQTTnet.Samples.Server
                     {
                         o.ListenAnyIP(1883, l => l.UseMqtt());
                         o.ListenAnyIP(5002);
+                        o.ListenAnyIP(8883, l => l.UseHttps()); // MQTT over WebSockets with SSL
                     });
                     webBuilder.UseStartup<Startup>();
                 });
@@ -98,6 +99,7 @@ namespace MQTTnet.Samples.Server
             services.AddHostedMqttServer(optionsBuilder =>
             {
                 optionsBuilder.WithDefaultEndpoint();
+                optionsBuilder.WithEncryptedEndpoint();
             });
 
             services.AddMqttConnectionHandler();
