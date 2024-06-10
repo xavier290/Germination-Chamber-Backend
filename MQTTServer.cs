@@ -20,8 +20,11 @@ namespace MQTTnet.Samples.Server
                     webBuilder.UseKestrel(o =>
                     {
                         o.ListenAnyIP(1883, l => l.UseMqtt());
-                        o.ListenAnyIP(5002);
-                        o.ListenAnyIP(8883, l => l.UseHttps()); // MQTT over WebSockets with SSL
+                        o.ListenAnyIP(5002, listenOptions =>
+                        {
+                            listenOptions.UseHttps(); // Enable HTTPS if needed
+                            listenOptions.UseMqtt();  // Enable MQTT
+                        });
                     });
                     webBuilder.UseStartup<Startup>();
                 });
