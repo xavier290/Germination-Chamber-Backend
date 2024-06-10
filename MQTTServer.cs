@@ -20,10 +20,7 @@ namespace MQTTnet.Samples.Server
                     webBuilder.UseKestrel(o =>
                     {
                         o.ListenAnyIP(1883, l => l.UseMqtt());
-                        o.ListenAnyIP(5002, listenOptions =>
-                        {
-                            listenOptions.UseMqtt();  // Enable MQTT
-                        });
+                        o.ListenAnyIP(5002);
                     });
                     webBuilder.UseStartup<Startup>();
                 });
@@ -101,7 +98,6 @@ namespace MQTTnet.Samples.Server
             services.AddHostedMqttServer(optionsBuilder =>
             {
                 optionsBuilder.WithDefaultEndpoint();
-                optionsBuilder.WithEncryptedEndpoint();
             });
 
             services.AddMqttConnectionHandler();
