@@ -23,7 +23,7 @@ public static class Server_ASP_NET_Samples
  
                             // This will allow MQTT connections based on HTTP WebSockets with URI "localhost:5000/mqtt"
                             // See code below for URI configuration.
-                            o.ListenAnyIP(5085); // Default HTTP pipeline
+                            o.ListenAnyIP(5002); // Default HTTP pipeline
                         });
  
                     webBuilder.UseStartup<Startup>();
@@ -74,6 +74,7 @@ public static class Server_ASP_NET_Samples
         public void Configure(IApplicationBuilder app, IWebHostEnvironment environment, MqttController mqttController)
         {
             app.UseRouting();
+            app.UseCors("AllowAll");
  
             app.UseEndpoints(
                 endpoints =>
@@ -116,6 +117,16 @@ public static class Server_ASP_NET_Samples
  
             services.AddSingleton<MqttController>();
             services.AddHealthChecks();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
         }
     }
 }
