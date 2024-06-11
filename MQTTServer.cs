@@ -82,6 +82,7 @@ public static class Server_ASP_NET_Samples
                         "/mqtt",
                         httpConnectionDispatcherOptions => httpConnectionDispatcherOptions.WebSockets.SubProtocolSelector =
                             protocolList => protocolList.FirstOrDefault() ?? string.Empty);
+                    endpoints.MapHealthChecks("/health");
                 });
  
             app.UseMqttServer(
@@ -114,6 +115,7 @@ public static class Server_ASP_NET_Samples
             services.AddConnections();
  
             services.AddSingleton<MqttController>();
+            services.AddHealthChecks();
         }
     }
 }
