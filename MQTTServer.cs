@@ -1,161 +1,119 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using MQTTnet.AspNetCore;
+﻿using MQTTnet.AspNetCore;
 using MQTTnet.Server;
 using My_MQTT_Server;
-using ModelsMQTT_Server;
-using System.Text;
-using Newtonsoft.Json.Serialization;
-
-namespace MQTTnet.Samples.Server
+ 
+namespace MQTTnet.Samples.Server;
+ 
+public static class Server_ASP_NET_Samples
 {
-    public static class Server_ASP_NET_Samples
+    public static Task Start_Server_With_WebSockets_Support()
     {
-        public static Task Start_Server_With_WebSockets_Support()
-        {
-            var host = Host.CreateDefaultBuilder(Array.Empty<string>())
-                .ConfigureWebHostDefaults(webBuilder =>
+        /*
+         * This sample starts a minimal ASP.NET Webserver including a hosted MQTT server.
+         */
+        var host = Host.CreateDefaultBuilder(Array.Empty<string>())
+            .ConfigureWebHostDefaults(
+                webBuilder =>
                 {
-                    webBuilder.UseKestrel(o =>
-                    {
-                        o.ListenAnyIP(1883, l => l.UseMqtt());
-                        o.ListenAnyIP(5002);
-                    });
+                    webBuilder.UseKestrel(
+                        o =>
+                        {
+                            // This will allow MQTT connections based on TCP port 1883.
+                            o.ListenAnyIP(1883, l => l.UseMqtt());
+ 
+                            // This will allow MQTT connections based on HTTP WebSockets with URI "localhost:5000/mqtt"
+                            // See code below for URI configuration.
+                            o.ListenAnyIP(5085); // Default HTTP pipeline
+                        });
+ 
                     webBuilder.UseStartup<Startup>();
                 });
-
-            return host.RunConsoleAsync();
-        }
+ 
+        return host.RunConsoleAsync();
     }
-
-    public class MqttController
+ 
+    sealed class MqttController
     {
-        private readonly MessageProcessor _messageProcessor;
-        public MqttController(MessageProcessor messageProcessor)
+        public MqttController()
         {
-            _messageProcessor = messageProcessor;
+            // Inject other services via constructor.
         }
-
+ 
+        /// <summary>
+        /// This event is triggered when the client publishes a message to the server
+        /// </summary>
+        /// <param name="eventArgs"></param>
+        /// <returns></returns>
         public async Task<Task> OnClientPublishAsync(InterceptingPublishEventArgs eventArgs)
         {
             string topic = eventArgs.ApplicationMessage.Topic;
             string message = eventArgs.ApplicationMessage.ConvertPayloadToString();
-
-            bool result = await _messageProcessor.ProcessMessage(topic, message);
-
-            if(!result) 
-            {
-                return Task.FromException(new Exception("An error occurred while processing the message."));
-            }
-
+ 
+            //Console.Write("Client payload:" + message);
+ 
+            bool result = await MessageProcessor.ProcessMessage(topic, message);
+ 
             return Task.CompletedTask;
         }
-
+ 
+        /// <summary>
+        /// This event is called before OnClientPublishAsync and could be a good place to do security checks etc.
+        /// </summary>
+        /// <param name="eventArgs"></param>
+        /// <returns></returns>
         public Task ValidateConnection(ValidatingConnectionEventArgs eventArgs)
         {
             Console.WriteLine($"Client '{eventArgs.ClientId}' wants to connect. Accepting!");
             return Task.CompletedTask;
         }
+ 
     }
-
-    public class Startup
+ 
+    sealed class Startup
     {
         public void Configure(IApplicationBuilder app, IWebHostEnvironment environment, MqttController mqttController)
         {
-            if (environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            // app.UseCors("CorsPolicy"); // Enable CORS
-            app.UseCors("AllowAll");
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapConnectionHandler<MqttConnectionHandler>(
-                    "/mqtt",
-                    httpConnectionDispatcherOptions => httpConnectionDispatcherOptions.WebSockets.SubProtocolSelector =
-                        protocolList => protocolList.FirstOrDefault() ?? string.Empty);
-                endpoints.MapHealthChecks("/health");
-            });
-
-            app.UseMqttServer(server =>
-            {
-                server.ValidatingConnectionAsync += mqttController.ValidateConnection;
-                server.InterceptingPublishAsync += mqttController.OnClientPublishAsync;
-            });
+ 
+            app.UseEndpoints(
+                endpoints =>
+                {
+                    endpoints.MapConnectionHandler<MqttConnectionHandler>(
+                        "/mqtt",
+                        httpConnectionDispatcherOptions => httpConnectionDispatcherOptions.WebSockets.SubProtocolSelector =
+                            protocolList => protocolList.FirstOrDefault() ?? string.Empty);
+                });
+ 
+            app.UseMqttServer(
+                server =>
+                {
+                    /*
+                     * Attach event handlers etc. if required.
+                     */
+ 
+                    server.ValidatingConnectionAsync += mqttController.ValidateConnection;
+                    server.InterceptingPublishAsync += mqttController.OnClientPublishAsync;
+ 
+                    //The following events might also be useful...
+                    //server.ClientConnectedAsync += mqttController.OnClientConnected;
+                    //server.InterceptingClientEnqueueAsync += mqttController.OnClientSendMessage;
+                    //server.ClientSubscribedTopicAsync += mqttController.OnClientSubscribedTopic;
+ 
+                });
         }
-
+ 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHostedMqttServer(optionsBuilder =>
-            {
-                optionsBuilder.WithDefaultEndpoint();
-            });
-
+            services.AddHostedMqttServer(
+                optionsBuilder =>
+                {
+                    optionsBuilder.WithDefaultEndpoint();
+                });
+ 
             services.AddMqttConnectionHandler();
             services.AddConnections();
-
-            services.AddDbContext<MqttDbContext>(options =>
-                options.UseSqlServer("Server=tcp:germination-chamber.database.windows.net,1433;Initial Catalog=MqttDb;Persist Security Info=False;User ID=Xavi;Password=GerminationChamber172523@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"),
-                ServiceLifetime.Scoped);
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = "https://dolphin-app-hlqw2.ondigitalocean.app/",
-                    ValidAudience = "https://dolphin-app-hlqw2.ondigitalocean.app/",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("9vL9PIK08MpvS5RD2AfuYatu8l/9WhANOULkmzdSL+E"))
-                };
-            });
-
-            services.AddScoped<MqttController>();
-            services.AddScoped<MessageProcessor>();
-            services.AddScoped<UserRepository>();
-
-            services.AddControllers()
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                });
-            services.AddHealthChecks();
-            // Configure CORS to allow requests from your frontend
-            // services.AddCors(options =>
-            // {
-            //     options.AddPolicy("CorsPolicy",
-            //         builder => builder
-            //         .WithOrigins("http://localhost:3000")
-            //         .AllowAnyMethod()
-            //         .AllowAnyHeader()
-            //         .AllowCredentials());
-            // });
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll", builder =>
-                {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyMethod()
-                           .AllowAnyHeader();
-                });
-            });
+ 
+            services.AddSingleton<MqttController>();
         }
     }
 }
