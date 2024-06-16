@@ -23,7 +23,7 @@ app.use('/api/auth', require('./backend/routes/authRoutes'));
 app.use('/api/temperature', require('./backend/routes/temperatureRoutes'));
 app.use('/api/humidity', require('./backend/routes/humidityRoutes'));
 app.use('/api/luminosity', require('./backend/routes/luminosityRoutes'));
-
+app.use('/api/parameters', require('./backend/routes/parametersRoutes'));
 
 
 app.listen(port, () => console.log(`Server started and listening on port ${port}`));
