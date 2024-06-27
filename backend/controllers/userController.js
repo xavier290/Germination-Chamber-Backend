@@ -30,7 +30,7 @@ const loginUser = asyncHandler(async (req, res) => {
     });
 
     if (!user) {
-        return res.status(400).json({ message: 'Invalid Credentials.' });
+        return res.status(403).json({ message: 'Invalid Credentials.' });
     }
 
     // Check if password matches

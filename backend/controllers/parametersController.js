@@ -22,4 +22,23 @@ const updateParameters = async (req, res) => {
   }
 };
 
-module.exports = { updateParameters };
+
+// @desc    Get parameters
+// @route   GET /api/parameters/info/:id
+// @access  Public
+const getParameters = async (req, res) => {
+  try {
+    const parameters = await Parameters.findById(req.params.id);
+
+    if (!parameters) {
+      return res.status(404).json({ message: 'Parameters not found' });
+    }
+
+    res.status(200).json(parameters);
+  } 
+  catch (error) {
+    res.status(500).json({ message: 'Failed to get parameters', error });
+  }
+}
+
+module.exports = { updateParameters, getParameters };
