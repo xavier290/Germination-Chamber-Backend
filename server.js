@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/auth', require('./backend/routes/authRoutes'));
 app.use('/api/temperature', require('./backend/routes/temperatureRoutes'));
+app.use('/api/relative', require('./backend/routes/relativeRoutes'));
 app.use('/api/humidity', require('./backend/routes/humidityRoutes'));
 app.use('/api/luminosity', require('./backend/routes/luminosityRoutes'));
 app.use('/api/parameters', require('./backend/routes/parametersRoutes'));
